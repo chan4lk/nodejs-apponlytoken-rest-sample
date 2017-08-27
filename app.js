@@ -5,22 +5,23 @@
 
 var auth = require('./auth');
 var graph = require('./graph');
-console.log('hi');
 
 // Get an access token for the app.
 auth.getAccessToken().then(function (token) {
   // Get all of the users in the tenant.
-  graph.getUsers(token)
-    .then(function (/* users*/) {
-      // Create an event on each user's calendar.
-      graph.getEvents(token, 'chandima@chandimaranaweera.com')
-        .then(function (events) {
-          events.forEach(function (event) {
-            console.log('%c %c', event.start.dateTime, event.end.dateTime);
-          });
+
+  // Create an event on each user's calendar.
+  graph.getListItems(token)
+    .then(function (items) {
+      items.forEach(function (item) {
+        graph.getListItem(token, item.id).then(function (itemInfo) {
+          console.log('%c %c', itemInfo.Title, itemInfo.VTXAnswer);
+        }, function (error) {
+          console.error('>>> Error getting items: ' + error);
         });
+      });
     }, function (error) {
-      console.error('>>> Error getting users: ' + error);
+      console.error('>>> Error getting items: ' + error);
     });
 }, function (error) {
   console.error('>>> Error getting access token: ' + error);

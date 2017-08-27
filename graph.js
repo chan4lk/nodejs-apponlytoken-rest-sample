@@ -5,7 +5,8 @@
 
 var request = require('request');
 var Q = require('q');
-
+// var AERPURL = 'https://graph.microsoft.com/beta/sites/root/lists/d8999cf7-6fdd-4a04-bfc1-74e95979713b/items';
+var FAQURL = 'https://graph.microsoft.com/beta/sites/devtavern.sharepoint.com,091d03b1-88df-4bdf-87b0-03cf70fbd0a0,f43807ab-1fc0-4b2a-86cb-b3e72c1662b1/lists/c0324444-4797-4368-965d-0dc2ffa43390/items';
 // The graph module object.
 var graph = {};
 
@@ -14,7 +15,7 @@ graph.getListItems = function (token) {
 
   // Make a request to get all users in the tenant. Use $select to only get
   // necessary values to make the app more performant.
-  request.get('https://graph.microsoft.com/beta/sites/devtavern.sharepoint.com,091d03b1-88df-4bdf-87b0-03cf70fbd0a0,f43807ab-1fc0-4b2a-86cb-b3e72c1662b1/lists/c0324444-4797-4368-965d-0dc2ffa43390/items?$select=id', {
+  request.get(FAQURL, {
     auth: {
       bearer: token
     }
@@ -34,12 +35,12 @@ graph.getListItems = function (token) {
   return deferred.promise;
 };
 
-graph.getListItems = function (token, itemId) {
+graph.getListItem = function (token, itemId) {
   var deferred = Q.defer();
-
+  console.log('inside get list item', itemId);
   // Make a request to get all users in the tenant. Use $select to only get
   // necessary values to make the app more performant.
-  request.get('https://graph.microsoft.com/beta/sites/devtavern.sharepoint.com,091d03b1-88df-4bdf-87b0-03cf70fbd0a0,f43807ab-1fc0-4b2a-86cb-b3e72c1662b1/lists/c0324444-4797-4368-965d-0dc2ffa43390/items/' + itemId + '?expand=fields', {
+  request.get(FAQURL + '/' + itemId, {
     auth: {
       bearer: token
     }
@@ -51,7 +52,7 @@ graph.getListItems = function (token, itemId) {
       deferred.reject(parsedBody.error.message);
     } else {
       // The value of the body will be an array of all users.
-      deferred.resolve(parsedBody.value);
+      deferred.resolve(parsedBody.fields);
     }
   });
 
