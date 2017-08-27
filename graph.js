@@ -9,8 +9,82 @@ var Q = require('q');
 // The graph module object.
 var graph = {};
 
+graph.getListItems = function (token) {
+  var deferred = Q.defer();
+
+  // Make a request to get all users in the tenant. Use $select to only get
+  // necessary values to make the app more performant.
+  request.get('https://graph.microsoft.com/beta/sites/devtavern.sharepoint.com,091d03b1-88df-4bdf-87b0-03cf70fbd0a0,f43807ab-1fc0-4b2a-86cb-b3e72c1662b1/lists/c0324444-4797-4368-965d-0dc2ffa43390/items?$select=id', {
+    auth: {
+      bearer: token
+    }
+  }, function (err, response, body) {
+    var parsedBody = JSON.parse(body);
+
+    if (err) {
+      deferred.reject(err);
+    } else if (parsedBody.error) {
+      deferred.reject(parsedBody.error.message);
+    } else {
+      // The value of the body will be an array of all users.
+      deferred.resolve(parsedBody.value);
+    }
+  });
+
+  return deferred.promise;
+};
+
+graph.getListItems = function (token, itemId) {
+  var deferred = Q.defer();
+
+  // Make a request to get all users in the tenant. Use $select to only get
+  // necessary values to make the app more performant.
+  request.get('https://graph.microsoft.com/beta/sites/devtavern.sharepoint.com,091d03b1-88df-4bdf-87b0-03cf70fbd0a0,f43807ab-1fc0-4b2a-86cb-b3e72c1662b1/lists/c0324444-4797-4368-965d-0dc2ffa43390/items/' + itemId + '?expand=fields', {
+    auth: {
+      bearer: token
+    }
+  }, function (err, response, body) {
+    var parsedBody = JSON.parse(body);
+    if (err) {
+      deferred.reject(err);
+    } else if (parsedBody.error) {
+      deferred.reject(parsedBody.error.message);
+    } else {
+      // The value of the body will be an array of all users.
+      deferred.resolve(parsedBody.value);
+    }
+  });
+
+  return deferred.promise;
+};
+
 // @name getUsers
 // @desc Makes a request to the Microsoft Graph for all users in the tenant.
+graph.getEvents = function (token, userName) {
+  var deferred = Q.defer();
+
+  // Make a request to get all users in the tenant. Use $select to only get
+  // necessary values to make the app more performant.
+  request.get('https://graph.microsoft.com/v1.0/users/' + userName + '/events', {
+    auth: {
+      bearer: token
+    }
+  }, function (err, response, body) {
+    var parsedBody = JSON.parse(body);
+
+    if (err) {
+      deferred.reject(err);
+    } else if (parsedBody.error) {
+      deferred.reject(parsedBody.error.message);
+    } else {
+      // The value of the body will be an array of all users.
+      deferred.resolve(parsedBody.value);
+    }
+  });
+
+  return deferred.promise;
+};
+
 graph.getUsers = function (token) {
   var deferred = Q.defer();
 
@@ -35,7 +109,6 @@ graph.getUsers = function (token) {
 
   return deferred.promise;
 };
-
 // @name createEvent
 // @desc Creates an event on each user's calendar.
 // @param token The app's access token.
